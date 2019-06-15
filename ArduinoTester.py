@@ -11,8 +11,8 @@ def main():
     connector = ArduinoConnector(port)
     print('Initializing serial port...')
     connector.initialize()
-    print("Sending some bytes...")
-    connector.write(b'abcdefg')
+    data = input("Write the string to send: ")
+    connector.write(data.encode())
 
     print("All bytes sent")
     exit()
@@ -23,7 +23,7 @@ def choosePort(ports):
     selected_index = 0
     while not exit:
         for i, p in enumerate(ports):
-            print('Port '+str(i)+": " + str(p))
+            print('Port ' + str(i) + ": " + str(p))
         number = input("Choose the port (type number): ")
         try:
             selected_index = int(number)
