@@ -26,6 +26,11 @@
 *.sql
 *.sqlite
 
+# Python cache #
+################
+
+__pycache__/
+
 # OS generated files #
 ######################
 .idea

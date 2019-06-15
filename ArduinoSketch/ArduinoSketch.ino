@@ -30,6 +30,7 @@ void receiveBytes() {
     }
     count = count + 1;
   }
+  blink_led_builtin(4);
 }
 
 void ManageDataReceived() {
