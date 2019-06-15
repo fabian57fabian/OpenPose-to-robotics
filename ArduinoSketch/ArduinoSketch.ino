@@ -1,4 +1,8 @@
-String readString="";
+#define packetLength 10
+
+byte recvArray[packetLength];
+int count;
+byte tmpByte;
 
 void setup() {
   Serial.begin(9600);  // initialize serial communications at 9600 bps
@@ -6,30 +10,52 @@ void setup() {
 }
 
 void loop() {
-  while (Serial.available())
-  {
-    if (Serial.available() > 0)
-    {
-      char c = Serial.read();  //gets one byte from serial buffer
-      readString += c; //makes the string readString
+  if (Serial.available()) {
+    delay(30);
+    receiveBytes();
+    if (count + 1 >= packetLength) {
+      ManageDataReceived();
     }
-  }
-  if (readString.length() > 0) {
-    ManageDataReceived();
-  }else{
-      delay(10);
+  } else {
+    delay(10);
   }
 }
 
-void ManageDataReceived(){
-  blink_led_builtin();
+void receiveBytes() {
+  count = 0;
+  while (Serial.available()) {
+    tmpByte = Serial.read();
+    if (count < packetLength) {
+      recvArray[count] = tmpByte;
+    }
+    count = count + 1;
+  }
 }
 
-void blink_led_builtin() {
-  for (int i = 0; i < 3; i++) {
+void ManageDataReceived() {
+  char a = recvArray[0];
+  switch (a) {
+    case 'f':
+      //Go forward
+      break;
+    case 'b':
+      //Go backward
+      break;
+    case 'r':
+      //Go Right
+      break;
+    case 'l':
+      //Go Left
+      break;
+  }
+  //blink_led_builtin(num);
+}
+
+void blink_led_builtin(int num) {
+  for (int i = 0; i < num; i++) {
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(200);
+    delay(100);
     digitalWrite(LED_BUILTIN, LOW);
-    delay(200);
+    delay(100);
   }
 }
