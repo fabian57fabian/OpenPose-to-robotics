@@ -1,17 +1,23 @@
+#include <Servo.h>
+Servo servoH;
+
 #define packetLength 10
+#define min_angleH 10
+#define max_angleH 170
 
 byte recvArray[packetLength];
 int count;
 byte tmpByte;
 
 void setup() {
+  servoH.attach(9);
   Serial.begin(9600);  // initialize serial communications at 9600 bps
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
   if (Serial.available()) {
-    delay(30);
+    delay(10);
     receiveBytes();
     if (count + 1 >= packetLength) {
       ManageDataReceived();
@@ -30,26 +36,22 @@ void receiveBytes() {
     }
     count = count + 1;
   }
-  blink_led_builtin(4);
 }
 
 void ManageDataReceived() {
-  char a = recvArray[0];
-  switch (a) {
-    case 'f':
-      //Go forward
-      break;
-    case 'b':
-      //Go backward
-      break;
-    case 'r':
-      //Go Right
-      break;
-    case 'l':
-      //Go Left
-      break;
+  int angle=getAngle();
+  if(angle >= min_angleH && angle <=max_angleH){
+    //blink_led_builtin(2);
+    servoH.write(angle);
+    delay(1);
   }
-  //blink_led_builtin(num);
+}
+
+int getAngle(){
+  int angle=(recvArray[0]-48)*100;
+  angle=angle+(recvArray[1]-48)*10;
+  angle=angle+(recvArray[2]-48)*1;
+  return angle;
 }
 
 void blink_led_builtin(int num) {

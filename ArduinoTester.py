@@ -11,10 +11,16 @@ def main():
     connector = ArduinoConnector(port)
     print('Initializing serial port...')
     connector.initialize()
-    data = input("Write the string to send: ")
-    connector.write(data.encode())
-
-    print("All bytes sent")
+    _continue = True
+    while (_continue):
+        data = input("Write the angle(°) to send: ")
+        try:
+            angle = int(data)
+            if angle == -1:
+                _continue = False
+            connector.writeAngle(data)
+        except ValueError:
+            print("This is not an integer value.")
     exit()
 
 

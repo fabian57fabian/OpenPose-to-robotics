@@ -49,9 +49,19 @@ class ArduinoConnector:
     Takes the given string and sends it thru serial
     """
 
-    def write(self, string):
+    def writeString(self, string):
         if self.initialized:
-            self.arduino.write(string)
+            self.arduino.write(string.encode())
+            print("Sent '" + string + "'")
+
+    def writeAngle(self, angle):
+        output = ""
+        grades = int(angle)
+        if 0 <= grades <= 180:
+            output += str(grades).zfill(3)
+            for i in range(7):
+                output += 'z'
+            self.writeString(output)
 
     def initialize(self):
         self.arduino = serial.Serial(self.port, self.baudrate)
