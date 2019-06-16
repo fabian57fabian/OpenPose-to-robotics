@@ -57,3 +57,5 @@ CMakeFiles/
 cmake_install.cmake
 Makefile
 openpose_python.py
+INSTALL.vcxproj
+INSTALL.vcxproj.filters
