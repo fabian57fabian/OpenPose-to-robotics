@@ -1,5 +1,6 @@
 from ArduinoComunication import ArduinoConnector
 from ArduinoComunication import serial_ports
+import time
 
 
 def main():
@@ -12,16 +13,41 @@ def main():
     print('Initializing serial port...')
     connector.initialize()
     _continue = True
+    say_hi(connector)
     while (_continue):
+        """
         data = input("Write the angle(°) to send: ")
         try:
             angle = int(data)
             if angle == -1:
                 _continue = False
-            connector.writeAngle(data)
+            else:
+                if 0 <= angle <= 180:
+                    connector.writeAngle(data)
         except ValueError:
             print("This is not an integer value.")
+        """
+        print("Format: 'XXXYYYZZZ' where XXX is X angle, YYY is Y angle, ZZZ is z angle (if <100 add zeros)")
+        data = input("Write data to send")
+        connector.writeString(data)
     exit()
+
+
+def say_hi(connector):
+    print("Sending hi command")
+    connector.writeString('100170055')
+    time.sleep(3)
+    connector.writeString('150010060')
+    time.sleep(2)
+    connector.writeString('150010030')
+    time.sleep(1)
+    connector.writeString('150010060')
+    time.sleep(1)
+    connector.writeString('150010030')
+    time.sleep(1)
+    connector.writeString('150010060')
+    time.sleep(2)
+    connector.writeString('100170055')
 
 
 def choosePort(ports):
