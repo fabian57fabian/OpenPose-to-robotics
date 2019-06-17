@@ -13,7 +13,8 @@ def main():
     print('Initializing serial port...')
     connector.initialize()
     _continue = True
-    say_hi(connector)
+    #say_hi(connector)
+    test1(connector)
     while (_continue):
         """
         data = input("Write the angle(°) to send: ")
@@ -31,6 +32,23 @@ def main():
         data = input("Write data to send")
         connector.writeString(data)
     exit()
+
+
+def test1(connector):
+    connector.writeString('100170055')
+    time.sleep(.5)
+    connector.writeString('105170055')
+    time.sleep(.5)
+    connector.writeString('110170055')
+    time.sleep(.5)
+    connector.writeString('115170055')
+    time.sleep(.5)
+    connector.writeString('120170055')
+    time.sleep(.5)
+    connector.writeString('125170055')
+    time.sleep(.5)
+    connector.writeString('130170055')
+    time.sleep(.5)
 
 
 def say_hi(connector):
