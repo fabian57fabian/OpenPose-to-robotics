@@ -16,7 +16,7 @@ void setup() {
   servoY.attach(10);
   servoZ.attach(11);
   delay(30);
-  servoX.write(100);
+  servoX.write(90);
   servoY.write(170);
   servoZ.write(55);
   Serial.begin(9600);  // initialize serial communications at 9600 bps
