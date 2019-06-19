@@ -10,7 +10,7 @@ int speed_min = 100; //the minimum "speed" the motors will turn - take it lower 
 int speed_max = 255; //the maximum "speed" the motors will turn – you can’t put in higher
 int pinServo = 10;
 int pinState = 22;
-int avanti = 101, destra = 125, sinistra = 75;
+int avanti = 90, destra = 70, sinistra = 110;
 int pinFrontLights, pinBackLights, pinHorn;
 int MODE;
 Servo sterzo;
