@@ -3,8 +3,7 @@ import sys
 from sys import *
 import os
 import time
-import shutil
-from pathlib import Path
+
 from steering import steering_angle
 
 
@@ -46,12 +45,6 @@ params["alpha_pose"] = 1
 #stampa dei parametri
 #print(params)
 try:
-    #verifico se esiste la cartella degli output in Json del detecting; se esiste,
-    # la sovrascrivo nel corso del nuovo detecting (solo se salvo output Json)
-    path = Path('C:/Users/loren/OneDrive/Documenti/GitHub/openpose/build/examples/tutorial_api_python/IVA_pose_estimation_results')
-    if(path.exists()):
-        #elimino il contenuto della cartella dei risultati json ogni volta che provo a fare il detecting
-        shutil.rmtree('C:/Users/loren/OneDrive/Documenti/GitHub/openpose/build/examples/tutorial_api_python/IVA_pose_estimation_results')
 
     # Starting OpenPose
     opWrapper = op.WrapperPython()
