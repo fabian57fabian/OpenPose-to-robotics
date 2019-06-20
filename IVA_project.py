@@ -176,6 +176,6 @@ try:
 
 # Openpose obj allocation error
 except Exception as e:
-    # print(e)
+    print(e)
     sys.exit(-1)
 
