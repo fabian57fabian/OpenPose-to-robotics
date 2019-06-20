@@ -2,7 +2,6 @@
 
 #define TxD 3
 #define RxD 2
-#define LED_PIN 13
 
 char c;
 
@@ -11,8 +10,7 @@ SoftwareSerial bluetooth(RxD, TxD);
 void setup() {
   Serial.begin(9600);
   Serial.println("Started");
-  bluetooth.begin(9600);
-  pinMode(LED_PIN, OUTPUT);
+  bluetooth.begin(38400);
 }
 
 void loop() {

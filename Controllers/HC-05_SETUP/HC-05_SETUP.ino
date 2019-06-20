@@ -14,7 +14,7 @@
 
 
 #include <SoftwareSerial.h>
-SoftwareSerial BTserial(10,11); // RX | TX
+SoftwareSerial BTserial(2,3); // RX | TX
 // Connect the HC-05 TX to Arduino pin 2 RX.
 // Connect the HC-05 RX to Arduino pin 3 TX through a voltage divider.
 

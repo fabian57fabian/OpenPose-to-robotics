@@ -26,7 +26,7 @@ AF_DCMotor motor(1); // create motor #3, 1KHz pwm
 void setup() {
   MODE = 1;
   Serial.begin(9600);
-  Serial1.begin(9600);
+  Serial1.begin(38400);
   sterzo.attach(pinServo);
 }
 
