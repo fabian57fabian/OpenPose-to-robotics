@@ -1,20 +1,14 @@
 from ArduinoComunication import ArduinoConnector
 from ArduinoComunication import serial_ports
+from SerialManager import ConnectToSerial
 import time
 
 
 def main():
-    ports = serial_ports()
-    if ports == None or len(ports) == 0:
-        print('Unable to find available ports')
-        exit()
-    port = choosePort(ports)
-    connector = ArduinoConnector(port)
-    print('Initializing serial port...')
-    connector.initialize()
+    carSerial = ConnectToSerial()
     _continue = True
-    #say_hi(connector)
-    test1(connector)
+    # say_hi(connector)
+    # test1(connector)
     while (_continue):
         """
         data = input("Write the angle(°) to send: ")
@@ -30,7 +24,7 @@ def main():
         """
         print("Format: 'XXXYYYZZZ' where XXX is X angle, YYY is Y angle, ZZZ is z angle (if <100 add zeros)")
         data = input("Write data to send")
-        connector.writeString(data)
+        carSerial.writeChar(data)
     exit()
 
 
@@ -68,21 +62,6 @@ def say_hi(connector):
     connector.writeString('100170055')
 
 
-def choosePort(ports):
-    exit = False
-    selected_index = 0
-    while not exit:
-        for i, p in enumerate(ports):
-            print('Port ' + str(i) + ": " + str(p))
-        number = input("Choose the port (type number): ")
-        try:
-            selected_index = int(number)
-            if 0 <= selected_index < len(ports):
-                exit = True
-        except ValueError:
-            pass
-
-    return ports[selected_index]
 
 
 if __name__ == "__main__":

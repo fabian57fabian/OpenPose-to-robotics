@@ -4,13 +4,14 @@ from sys import *
 import os
 import time
 from steering import steering_angle
+from SerialManager import ConnectToSerial
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 try:
     if platform == "win32":
         # Change these variables to point to the correct folder (Release/x64 etc.)
         sys.path.append(dir_path + '/../../python/openpose/Release');
-        os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/../../x64/Release;' +  dir_path + '/../../bin;'
+        os.environ['PATH'] = os.environ['PATH'] + ';' + dir_path + '/../../x64/Release;' + dir_path + '/../../bin;'
         import pyopenpose as op
     else:
         # Change these variables to point to the correct folder (Release/x64 etc.)
@@ -19,7 +20,8 @@ try:
         # sys.path.append('/usr/local/python')
         from openpose import pyopenpose as op
 except ImportError as e:
-    print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
+    print(
+        'Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
     raise e
 
 # Parameters op
@@ -29,10 +31,23 @@ params["number_people_max"] = 1
 params["body"] = 1
 params["alpha_pose"] = 1
 
+
+def sendSpeed(serial, speed):
+    if speed > 200:
+        serial.SetSpeed(100)
+    else:
+        serial.SetSpeed(int(speed / 2))
+
+
 # json saving results
 # params["write_json"] = "IVA_pose_estimation_results"
 
 try:
+    # Starting serial bluetooth connection
+    carSerial = ConnectToSerial()
+    if carSerial is None:
+        print("No port selected, exiting...")
+        sys.exit(-2)
 
     # Starting OpenPose
     opWrapper = op.WrapperPython()
@@ -57,7 +72,7 @@ try:
     # resizeWindow output windows webcam dimension. RESOLUTION -> 4:3
     cv2.namedWindow('DETECTED KEYPOINTS', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('DETECTED KEYPOINTS', 1000, 750)
-    stream = cv2.VideoCapture('WIN_20190620_16_25_09_Pro.mp4')
+    stream = cv2.VideoCapture(0)
 
     # Frame counter
     counter = 0
@@ -71,13 +86,13 @@ try:
         cv2.flip(img, 1, img)
         # Stop Line
         cv2.line(img, (160, 380), (480, 380), (0, 0, 255), thickness=3)
-        cv2.putText(img, 'STOP', (260,420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 0, 255), thickness=2)
+        cv2.putText(img, 'STOP', (260, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 0, 255), thickness=2)
         cv2.putText(img, 'B', (65, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 255, 0), thickness=2)
         cv2.putText(img, 'F', (545, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (255, 0, 0), thickness=2)
         # Speedometer
         cv2.putText(img, str(speed), (560, 50), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
 
-        if(status == 0):
+        if (status == 0):
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
         if (status == 1):
             cv2.putText(img, 'BACKWARD MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
@@ -97,8 +112,8 @@ try:
         opWrapper.emplaceAndPop([datum])
 
         # Detecting people control
-        if(str(datum.poseKeypoints) == str(2.0) or str(datum.poseKeypoints) == str(0.0)
-                or str(datum.poseKeypoints) == str(1e-45) ):
+        if (str(datum.poseKeypoints) == str(2.0) or str(datum.poseKeypoints) == str(0.0)
+                or str(datum.poseKeypoints) == str(1e-45)):
             print('NO DETECTED PEOPLE, YOU SHOULD GO IN FRONT OF YOUR WEBCAM')
             time.sleep(2)
 
@@ -121,38 +136,48 @@ try:
         if ((status == 0 and 380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160)
                 and RightWirst_y[counter] > 380):
             status = 1
+            carSerial.Backward()
             print('<-------BACKWARD', status)
         else:
             if ((status == 0 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640)
                     and LeftWirst_y[counter] > 380):
                 status = 2
+                carSerial.Forward()
                 print('FORWARD------->', status)
             else:
                 if (((LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] > 380.0) or (LeftWirst_y[counter] == 0.0
-                    and RightWirst_y[counter] == 0.0) or (LeftWirst_y[counter] == 0.0 and RightWirst_y[counter] > 380.0)
-                    or (LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] == 0.0))
+                                                                                          and RightWirst_y[
+                                                                                              counter] == 0.0) or (
+                             LeftWirst_y[counter] == 0.0 and RightWirst_y[counter] > 380.0)
+                     or (LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] == 0.0))
                         and (160 < LeftWirst_x[counter] < 640 and 0 < RightWirst_x[counter] < 480)
                         or (LeftWirst_x[counter] == 0.0 and RightWirst_x[counter] == 0.0)):
                     speed = 0
                     status = 0
                     print('------STOP------', status)
+                    carSerial.Stop()
 
         # Gestures detection
-        if(status != 0 and -10.0 < steeringAngle < 10.0
+        if (status != 0 and -10.0 < steeringAngle < 10.0
                 and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
 
             speed = int(380 - max(RightWirst_y[counter], LeftWirst_y[counter]))
             print('ACCELLERATION. STATUS: ', status, '. SPEED:  ', speed)
+            sendSpeed(carSerial, speed)
         else:
-            if(status != 0 and 10.0 < steeringAngle < 90.0
+            if (status != 0 and 10.0 < steeringAngle < 90.0
                     and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                 speed = int(380 - max(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('TURN LEFT----. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
+                sendSpeed(carSerial, speed)
+                carSerial.Steer(steeringAngle)
             else:
-                if( status != 0 and -90.0 < steeringAngle < -10.0
+                if (status != 0 and -90.0 < steeringAngle < -10.0
                         and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                     speed = int(380 - max(RightWirst_y[counter], LeftWirst_y[counter]))
                     print('TURN RIGHT---. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
+                    sendSpeed(carSerial, speed)
+                    carSerial.Steer(steeringAngle)
 
         # Output with OpenPose skeleton
         cv2.imshow('DETECTED KEYPOINTS', datum.cvOutputData)
@@ -179,4 +204,3 @@ try:
 except Exception as e:
     print(e)
     sys.exit(-1)
-

@@ -45,6 +45,10 @@ Thumbs.db
 # Files from OpenPose Examples #
 ################################
 
+frame.png
+video.avi
+fabian_cucina_test1.mp4
+fab_test.mp4
 CMakeFiles/
 01_body_from_image.py
 02_whole_body_from_image.py

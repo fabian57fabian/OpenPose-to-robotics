@@ -1,69 +1,84 @@
 #!/usr/bin/python
 import serial
-import syslog
 import time
-import sys
-import glob
-import time
-
-
-def serial_ports():
-    """ Lists serial port names
-
-        :raises EnvironmentError:
-            On unsupported or unknown platforms
-        :returns:
-            A list of the serial ports available on the system
-    """
-    if sys.platform.startswith('win'):
-        ports = ['COM%s' % (i + 1) for i in range(256)]
-    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-        # this excludes your current terminal "/dev/tty"
-        ports = glob.glob('/dev/tty[A-Za-z]*')
-    elif sys.platform.startswith('darwin'):
-        ports = glob.glob('/dev/tty.*')
-    else:
-        raise EnvironmentError('Unsupported platform')
-
-    result = []
-    for port in ports:
-        try:
-            s = serial.Serial(port)
-            s.close()
-            result.append(port)
-        except (OSError, serial.SerialException):
-            pass
-    return result
 
 
 class ArduinoConnector:
     defaultPort = '/dev/ttyUSB1'
 
     def __init__(self, port=defaultPort):
-        self.baudrate = 9600
+        self.baudrate = 38400
         self.port = port
         self.arduino = None
         self.initialized = False
+        self.last_speed = self.last_steer = self.last_direction = chr(126)
 
     """
-    Takes the given string and sends it thru serial
+    Takes the given cahr and sends it thru serial
     """
 
-    def writeString(self, string):
+    def writeChar(self, char):
         if self.initialized:
-            self.arduino.write(string.encode())
-            print("Sent '" + string + "'")
+            self.arduino.write(char.encode())
+            print("Sent '" + char + "'")
 
-    def writeAngle(self, angle):
-        output = ""
+    """
+    Takes a speed in range [0,100] and sends it
+    """
+
+    def SetSpeed(self, speed):
+        if speed is not None:
+            #print("Try to SET SPEED " + str(speed))
+            sp = chr(int(self.map(speed, 0, 100, 48, 57)))
+            if not sp == self.last_speed:
+                self.last_speed = sp
+                self.writeChar(sp)
+
+    def Stop(self):
+        if not self.last_direction == 'S':
+            self.last_direction = 'S'
+            self.writeChar('S')
+
+    def Forward(self):
+        if not self.last_direction == 'F':
+            self.last_direction = 'F'
+            self.writeChar('F')
+
+    def Backward(self):
+        if not self.last_direction == 'B':
+            self.last_direction = 'B'
+            self.writeChar('B')
+
+    """
+        Takes a steer value in range [-90,90] and sends it correctly
+    """
+
+    def Steer(self, angle):
+        print("Try to STEER " + str(angle))
         grades = int(angle)
-        if 0 <= grades <= 180:
-            output += str(grades).zfill(3)
-            for i in range(7):
-                output += 'z'
-            self.writeString(output)
+        final_command = '.'
+        if -90 <= grades < -50:
+            final_command = 'L'
+        elif -50 <= grades <= 50:
+            val = int(grades)+50
+            print("Steering "+str(val)+" from [0,100]")
+            converted_angle = int(self.map(grades + 50, 0, 100, 97, 122))
+            print("Converted char: " + str(converted_angle))
+            final_command = chr(converted_angle)
+        elif 50 < grades <= 90:
+            final_command = 'R'
+        else:
+            print("Angle not right:" + str(angle))
+            return
+
+        if not self.last_steer == final_command:
+            self.last_steer = final_command
+            self.writeChar(final_command)
 
     def initialize(self):
         self.arduino = serial.Serial(self.port, self.baudrate)
         time.sleep(2)
         self.initialized = True
+
+    def map(self, x, in_min, in_max, out_min, out_max):
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;

@@ -8,16 +8,18 @@ char c;
 SoftwareSerial bluetooth(RxD, TxD);
 
 void setup() {
-  Serial.begin(38400);
+  Serial.begin(9600);
   Serial.println("Started");
   bluetooth.begin(38400);
 }
 
 void loop() {
-  if (Serial.available()) {
-    c = Serial.read();
-    bluetooth.write(c);
-  } else {
-    delay(5);
+  if (bluetooth.available())
+  {
+    c = bluetooth.read();
+    Serial.write(c);
+  }
+  else{
+    delay(10);
   }
 }
