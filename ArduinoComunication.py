@@ -28,7 +28,7 @@ class ArduinoConnector:
 
     def SetSpeed(self, speed):
         if speed is not None:
-            #print("Try to SET SPEED " + str(speed))
+            # print("Try to SET SPEED " + str(speed))
             sp = chr(int(self.map(speed, 0, 100, 48, 57)))
             if not sp == self.last_speed:
                 self.last_speed = sp
@@ -38,6 +38,7 @@ class ArduinoConnector:
         if not self.last_direction == 'S':
             self.last_direction = 'S'
             self.writeChar('S')
+            self.SetSpeed(0)
 
     def Forward(self):
         if not self.last_direction == 'F':
@@ -60,8 +61,8 @@ class ArduinoConnector:
         if -90 <= grades < -50:
             final_command = 'L'
         elif -50 <= grades <= 50:
-            val = int(grades)+50
-            print("Steering "+str(val)+" from [0,100]")
+            val = int(grades) + 50
+            print("Steering " + str(val) + " from [0,100]")
             converted_angle = int(self.map(grades + 50, 0, 100, 97, 122))
             print("Converted char: " + str(converted_angle))
             final_command = chr(converted_angle)
