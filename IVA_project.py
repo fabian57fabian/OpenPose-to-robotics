@@ -22,7 +22,7 @@ except ImportError as e:
     print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
     raise e
 
-#parameters op
+# Parameters op
 params = dict()
 params["model_folder"] = "../../../models/"
 params["number_people_max"] = 1
@@ -57,7 +57,7 @@ try:
     # resizeWindow output windows webcam dimension. RESOLUTION -> 4:3
     cv2.namedWindow('DETECTED KEYPOINTS', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('DETECTED KEYPOINTS', 1000, 750)
-    stream = cv2.VideoCapture(0)
+    stream = cv2.VideoCapture('WIN_20190620_16_25_09_Pro.mp4')
 
     # Frame counter
     counter = 0
@@ -72,10 +72,10 @@ try:
         # Stop Line
         cv2.line(img, (160, 380), (480, 380), (0, 0, 255), thickness=3)
         cv2.putText(img, 'STOP', (260,420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 0, 255), thickness=2)
-        cv2.putText(img, 'B', (70, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 255, 0), thickness=2)
-        cv2.putText(img, 'F', (550, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (255, 0, 0), thickness=2)
+        cv2.putText(img, 'B', (65, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 255, 0), thickness=2)
+        cv2.putText(img, 'F', (545, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (255, 0, 0), thickness=2)
         # Speedometer
-        cv2.putText(img, str(speed), (500, 50), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
+        cv2.putText(img, str(speed), (560, 50), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
 
         if(status == 0):
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
@@ -87,7 +87,8 @@ try:
         # Backward/Forward zones
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
         cv2.rectangle(img, (480, 380), (640, 480), (255, 0, 0), thickness=2)
-        # Frame writer", img)
+        # Frame writer"
+        cv2.imwrite("frame.png", img)
 
         # Frame processor by OpenPose (datum class)
         datum = op.Datum()
