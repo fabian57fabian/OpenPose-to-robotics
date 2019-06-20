@@ -200,7 +200,7 @@ try:
     print('FPS: ', counter / total_time)
     print('-----------------------------------------------------------------------------------------------------------')
 
-# Openpose obj allocation error
+# Openpose OBJ allocation error
 except Exception as e:
     print(e)
     sys.exit(-1)
