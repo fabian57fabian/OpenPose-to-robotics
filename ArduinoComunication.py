@@ -11,7 +11,8 @@ class ArduinoConnector:
         self.port = port
         self.arduino = None
         self.initialized = False
-        self.last_speed = self.last_steer = self.last_direction = chr(126)
+        self.last_speed = self.last_direction = chr(126)
+        self.last_steer = 0
 
     """
     Takes the given cahr and sends it thru serial
@@ -57,15 +58,16 @@ class ArduinoConnector:
     def Steer(self, angle):
         print("Try to STEER " + str(angle))
         grades = int(angle)
-        final_command = '.'
+        final_command = 128
         if -90 <= grades < -50:
             final_command = 'L'
         elif -50 <= grades <= 50:
             val = int(grades) + 50
             print("Steering " + str(val) + " from [0,100]")
-            converted_angle = int(self.map(grades + 50, 0, 100, 97, 122))
+            # send char in range [128,228]
+            converted_angle = int(self.map(val, 0, 100, 85, 126))
             print("Converted char: " + str(converted_angle))
-            final_command = chr(converted_angle)
+            final_command = chr(converted_angle)  # chr(converted_angle)
         elif 50 < grades <= 90:
             final_command = 'R'
         else:

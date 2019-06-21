@@ -31,6 +31,14 @@ params["number_people_max"] = 1
 params["body"] = 1
 params["alpha_pose"] = 1
 
+def testChars():
+    for i in range(85,126,1):
+        print(chr(i))
+
+
+
+
+testChars()
 
 def sendSpeed(serial, speed):
     if speed > 200:
@@ -91,6 +99,9 @@ try:
         cv2.putText(img, 'F', (545, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (255, 0, 0), thickness=2)
         # Speedometer
         cv2.putText(img, str(speed), (560, 50), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
+        # steerAngle
+        cv2.putText(img, str(steeringAngle), (560, 100), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
+
 
         if (status == 0):
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
@@ -169,14 +180,14 @@ try:
                 speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('TURN LEFT----. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                 sendSpeed(carSerial, speed)
-                carSerial.Steer(steeringAngle)
+                carSerial.Steer(-steeringAngle)
             else:
                 if (status != 0 and -90.0 < steeringAngle < -5.0
                         and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                     speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                     print('TURN RIGHT---. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                     sendSpeed(carSerial, speed)
-                    carSerial.Steer(steeringAngle)
+                    carSerial.Steer(-steeringAngle)
 
         # Output with OpenPose skeleton
         cv2.imshow('DETECTED KEYPOINTS', datum.cvOutputData)
