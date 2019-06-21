@@ -9,5 +9,5 @@ def steering_angle(x1, y1, x2, y2):
     return angle
 
 def speed_value(y1, y2):
-    speed = (y1 + y2) / 2
+    speed = 380 - (y1 + y2) / 2
     return speed
