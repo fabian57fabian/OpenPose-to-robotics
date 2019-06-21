@@ -1,4 +1,3 @@
-#!/usr/bin/python
 import serial
 import time
 
@@ -21,7 +20,6 @@ class ArduinoConnector:
     def writeChar(self, char):
         if self.initialized:
             self.arduino.write(char.encode())
-            print("Sent '" + char + "'")
 
     """
     Takes a speed in range [0,100] and sends it
@@ -56,17 +54,14 @@ class ArduinoConnector:
     """
 
     def Steer(self, angle):
-        print("Try to STEER " + str(angle))
         grades = int(angle)
         final_command = 128
         if -90 <= grades < -50:
             final_command = 'L'
         elif -50 <= grades <= 50:
             val = int(grades) + 50
-            print("Steering " + str(val) + " from [0,100]")
             # send char in range [128,228]
             converted_angle = int(self.map(val, 0, 100, 85, 126))
-            print("Converted char: " + str(converted_angle))
             final_command = chr(converted_angle)  # chr(converted_angle)
         elif 50 < grades <= 90:
             final_command = 'R'
