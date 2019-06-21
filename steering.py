@@ -8,4 +8,6 @@ def steering_angle(x1, y1, x2, y2):
         angle = math.degrees(math.atan(m))
     return angle
 
-print(steering_angle(2.0, 0.0, 10.0, 0.0))
+def speed_value(y1, y2):
+    speed = (y1 + y2) / 2
+    return speed

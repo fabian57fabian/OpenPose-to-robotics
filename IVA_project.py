@@ -3,7 +3,7 @@ import sys
 from sys import *
 import os
 import time
-from steering import steering_angle
+from steering import *
 from SerialManager import ConnectToSerial
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -158,23 +158,22 @@ try:
                     carSerial.Stop()
 
         # Gestures detection
-        if (status != 0 and -10.0 < steeringAngle < 10.0
+        if (status != 0 and -5.0 < steeringAngle < 5.0
                 and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
-
-            speed = int(380 - max(RightWirst_y[counter], LeftWirst_y[counter]))
+            speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
             print('ACCELLERATION. STATUS: ', status, '. SPEED:  ', speed)
             sendSpeed(carSerial, speed)
         else:
-            if (status != 0 and 10.0 < steeringAngle < 90.0
+            if (status != 0 and 5.0 < steeringAngle < 90.0
                     and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
-                speed = int(380 - max(RightWirst_y[counter], LeftWirst_y[counter]))
+                speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('TURN LEFT----. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                 sendSpeed(carSerial, speed)
                 carSerial.Steer(steeringAngle)
             else:
-                if (status != 0 and -90.0 < steeringAngle < -10.0
+                if (status != 0 and -90.0 < steeringAngle < -5.0
                         and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
-                    speed = int(380 - max(RightWirst_y[counter], LeftWirst_y[counter]))
+                    speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                     print('TURN RIGHT---. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                     sendSpeed(carSerial, speed)
                     carSerial.Steer(steeringAngle)
