@@ -33,4 +33,4 @@ Well, OpenPose will need a good GPU so make sure to use a good one.
 Tests show that on a **GTX 1050** works at 6 fps and on a **GTX 1660ti** works at 19 fps.
 
 ## Contributors
-The entire project was made by [Lorenzo Pisanesci](https://github.com/pisalore) and [Fabian Greavu](https://github.com/fabian57fabian)
+The entire project was made by [Lorenzo Pisaneschi](https://github.com/pisalore) and [Fabian Greavu](https://github.com/fabian57fabian)
