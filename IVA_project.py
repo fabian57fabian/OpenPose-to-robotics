@@ -91,6 +91,9 @@ try:
         cv2.putText(img, 'F', (545, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (255, 0, 0), thickness=2)
         # Speedometer
         cv2.putText(img, str(speed), (560, 50), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
+        # steerAngle
+        cv2.putText(img, str(steeringAngle), (560, 100), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
+
 
         if (status == 0):
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
