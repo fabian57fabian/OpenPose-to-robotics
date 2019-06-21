@@ -22,7 +22,7 @@ void setup() {
 }
 
 void loop() {
-  incomingCommand = '~';      //This is an unused char command
+  incomingCommand = 'K';      //This is an unused char command
   //Check if no bluetooth connection
   if (digitalRead(pinState) == LOW) {
     motor.run(RELEASE);
@@ -37,10 +37,11 @@ void loop() {
       //Manage speed
       speedM = (((speed_max - speed_min) / 10) * ((incomingCommand - 48) + 1)) + speed_min;
       motor.setSpeed(speedM);
-    } else if (incomingCommand >= 97 && incomingCommand <= 122) {
-      //Manage Steering from [97, 122] to [destra, sinistra]
-      steerAngle = map(incomingCommand, 97, 122, sinistra, destra);
+    } else if (incomingCommand >= 85 && incomingCommand <= 126) {
+      //Manage Steering from [85, 126] to [destra, sinistra]
+      steerAngle = map(incomingCommand, 85, 126, sinistra, destra);
       sterzo.write(steerAngle);
+      Serial.println(steerAngle);
     } else {
       switch (incomingCommand)
       {
@@ -89,5 +90,4 @@ void loop() {
       }
     }
   }
-  Serial.println(speedM);
 }
