@@ -180,14 +180,14 @@ try:
                 speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('TURN LEFT----. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                 sendSpeed(carSerial, speed)
-                carSerial.Steer(-steeringAngle)
+                carSerial.Steer(- steeringAngle)
             else:
                 if (status != 0 and -90.0 < steeringAngle < -5.0
                         and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                     speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                     print('TURN RIGHT---. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                     sendSpeed(carSerial, speed)
-                    carSerial.Steer(-steeringAngle)
+                    carSerial.Steer(- steeringAngle)
 
         # Output with OpenPose skeleton
         cv2.imshow('DETECTED KEYPOINTS', datum.cvOutputData)
