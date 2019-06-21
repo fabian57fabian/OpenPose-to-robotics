@@ -31,14 +31,9 @@ params["number_people_max"] = 1
 params["body"] = 1
 params["alpha_pose"] = 1
 
-def testChars():
-    for i in range(85,126,1):
-        print(chr(i))
+min_angle_front = -3
+max_angle_front = 3
 
-
-
-
-testChars()
 
 def sendSpeed(serial, speed):
     if speed > 200:
@@ -46,6 +41,10 @@ def sendSpeed(serial, speed):
     else:
         serial.SetSpeed(int(speed / 2))
 
+
+steer_front = (255, 0, 0)
+steer_right = (0, 255, 0)
+steer_left = (0, 0, 255)
 
 # json saving results
 # params["write_json"] = "IVA_pose_estimation_results"
@@ -67,6 +66,11 @@ try:
     RightWirst_y = []
     LeftWirst_x = []
     LeftWirst_y = []
+
+    RightWirst_x.append(0.0)
+    RightWirst_y.append(0.0)
+    LeftWirst_x.append(0.0)
+    LeftWirst_y.append(0.0)
 
     # Car state: 0 (stop), 1 (backward), 2 (forward) (INT)
     status = 0
@@ -102,7 +106,6 @@ try:
         # steerAngle
         cv2.putText(img, str(steeringAngle), (560, 100), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 0, 0), thickness=2)
 
-
         if (status == 0):
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
         if (status == 1):
@@ -113,6 +116,16 @@ try:
         # Backward/Forward zones
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
         cv2.rectangle(img, (480, 380), (640, 480), (255, 0, 0), thickness=2)
+
+        steer_color = steer_front
+        if steeringAngle < min_angle_front:
+            steer_color = steer_left
+        if steeringAngle > max_angle_front:
+            steer_color = steer_right
+            # Line between hands
+        if not RightWirst_x[counter] == 0 and not LeftWirst_x[counter] == 0:
+            cv2.line(img, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
+                     pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
         # Frame writer"
         cv2.imwrite("frame.png", img)
 
@@ -169,20 +182,20 @@ try:
                     carSerial.Stop()
 
         # Gestures detection
-        if (status != 0 and -5.0 < steeringAngle < 5.0
+        if (status != 0 and min_angle_front < steeringAngle < max_angle_front
                 and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
             speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
             print('ACCELLERATION. STATUS: ', status, '. SPEED:  ', speed)
             sendSpeed(carSerial, speed)
         else:
-            if (status != 0 and 5.0 < steeringAngle < 90.0
+            if (status != 0 and max_angle_front < steeringAngle < 90.0
                     and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                 speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('TURN LEFT----. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)
                 sendSpeed(carSerial, speed)
                 carSerial.Steer(- steeringAngle)
             else:
-                if (status != 0 and -90.0 < steeringAngle < -5.0
+                if (status != 0 and -90.0 < steeringAngle < min_angle_front
                         and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                     speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                     print('TURN RIGHT---. STATUS: ', status, '. SPEED:  ', speed, '. ANGLE: ', steeringAngle)

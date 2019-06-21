@@ -15,7 +15,7 @@ class ArduinoConnector:
         self.last_steer = 0
 
     """
-    Takes the given cahr and sends it thru serial
+    Takes the given char and sends it thru serial
     """
 
     def writeChar(self, char):
