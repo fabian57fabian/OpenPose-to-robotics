@@ -1,6 +1,7 @@
 import argparse
 
 
+
 def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", default="0",
@@ -10,6 +11,10 @@ def parseArgs():
                              "\n(Default: 0)")
     parser.add_argument("--disable-car", action="store_true", default=False,
                         help="Disable comunication to Car. (Default false)")
+    parser.add_argument("--compute-analytics", action="store_true", default=False,
+                        help="Compute analytics. (Default false)")
+    parser.add_argument("--show-analytics", action="store_true", default=False,
+                        help="Shows analytics after computation. (Default false)")
     args = parser.parse_args()
     _s = 0
     try:
@@ -17,3 +22,4 @@ def parseArgs():
     except:
         _s = args.source
     return (not args.disable_car), _s, args
+

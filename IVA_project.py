@@ -5,8 +5,10 @@ from sys import *
 import math
 import os
 import time
+import numpy as np
 from SerialManager import ConnectToSerial
 from Utils import parseArgs
+from analytics import ProcessAnalytics
 
 sendCommandsToCar, source, args = parseArgs()
 
@@ -34,7 +36,7 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["number_people_max"] = 1
 params["body"] = 1
-params["alpha_pose"] = 0.5
+params["alpha_pose"] = 0
 # enable this to save data to json
 # params["write_json"] = "IVA_pose_estimation_results"
 
@@ -69,9 +71,13 @@ speed = 0
 # Car connector
 carSerial = None
 
+# Analytics vars
+accelerations = []#np.array([])
+steering_angles = []#np.array([])
+
 
 def main():
-    global speed, steeringAngle, status, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial
+    global speed, steeringAngle, status, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles
     # Starting serial bluetooth connection
     if sendCommandsToCar:
         carSerial = ConnectToSerial()
@@ -142,16 +148,6 @@ def main():
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
         cv2.rectangle(img, (480, 380), (640, 480), (255, 0, 0), thickness=2)
 
-
-        """Removed frame saving to file, better performances
-        # Frame writer"
-        cv2.imwrite("frame.png", img)
-
-        # Frame processor by OpenPose (datum class)
-        datum = op.Datum()
-        #imageToProcess = cv2.imread("frame.png")
-        datum.cvInputData = imageToProcess
-        """
         datum = op.Datum()
         datum.cvInputData = img
         opWrapper.emplaceAndPop([datum])
@@ -237,10 +233,14 @@ def main():
             cv2.line(img2, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
                      pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
         cv2.imshow('DETECTED KEYPOINTS', img2)
+
+        if args.compute_analytics:
+            accelerations.append(speed)
+            steering_angles.append(steeringAngle)
+
         counter = counter + 1
 
         # Quit gesture
-        print(quit_count)
         if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
                 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
             quit_count = quit_count + 1
@@ -327,10 +327,10 @@ def Steer(angle):
 
 if __name__ == "__main__":
     # rimesso apposto il main
-    #metto un commento
-    main()
+    # metto un commento
     try:
         main()
+        ProcessAnalytics(accelerations, steering_angles, args)
     except Exception as e:
         print(e)
         sys.exit(-1)
