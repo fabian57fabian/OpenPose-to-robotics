@@ -323,6 +323,8 @@ def Steer(angle):
 
 
 if __name__ == "__main__":
+    #metto un commento
+    #rimetto un altra cosa
     main()
     try:
         pass
