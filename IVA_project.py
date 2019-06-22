@@ -323,11 +323,11 @@ def Steer(angle):
 
 
 if __name__ == "__main__":
+    # rimesso apposto il main
     #metto un commento
-    #rimetto un altra cosa
     main()
     try:
-        pass
+        main()
     except Exception as e:
         print(e)
         sys.exit(-1)
