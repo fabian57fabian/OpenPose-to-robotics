@@ -25,7 +25,7 @@ pip3 install pyserial
 ```
 4. To run **OPtoROBO** from your terminal just enter the {OpenPoseClonedRepo}/build/examples/tutorial_api_python/ folder and type:
 ```
-python3 IKC_project.py
+python3 IVA_project.py
 ```
 
 ## Requirements
