@@ -225,7 +225,7 @@ def main():
         counter = counter + 1
 
         # Quit gesture
-        if ((380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160)
+        if (status == 0 and (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160)
                 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
             quit_count = quit_count + 1
             if (quit_count == 40):
