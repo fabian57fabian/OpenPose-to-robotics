@@ -323,9 +323,9 @@ def Steer(angle):
 
 
 if __name__ == "__main__":
-    main()
+    #rimesso apposto il main
     try:
-        pass
+        main()
     except Exception as e:
         print(e)
         sys.exit(-1)
