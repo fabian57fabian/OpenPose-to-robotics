@@ -31,7 +31,7 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["number_people_max"] = 1
 params["body"] = 1
-params["alpha_pose"] = 1
+params["alpha_pose"] = 0
 # enable this to save data to json
 # params["write_json"] = "IVA_pose_estimation_results"
 
@@ -90,12 +90,12 @@ def main():
     # Execution time
     start = time.time()
     fps = 0.0
-    fps_last_time = time.time()
-    fps_last_counter = counter
+    fps_last_time = time.time() - 1000
+    fps_last_counter = counter - 1
 
     while True:
         # Update fps
-        if counter % 5 == 0:
+        if counter % 5 == 1:
             fps = (counter - fps_last_counter) / (time.time() - fps_last_time)
             fps_last_time = time.time()
             fps_last_counter = counter
