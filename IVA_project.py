@@ -142,15 +142,7 @@ def main():
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
         cv2.rectangle(img, (480, 380), (640, 480), (255, 0, 0), thickness=2)
 
-        # Show line between hands
-        steer_color = steer_front
-        if steeringAngle < min_angle_front:
-            steer_color = steer_left
-        if steeringAngle > max_angle_front:
-            steer_color = steer_right
-        if not RightWirst_x[counter] == 0 and not LeftWirst_x[counter] == 0:
-            cv2.line(img, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
-                     pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
+
         """Removed frame saving to file, better performances
         # Frame writer"
         cv2.imwrite("frame.png", img)
@@ -234,14 +226,25 @@ def main():
                     Steer(- steeringAngle)
 
         # Output with OpenPose skeleton
-        cv2.imshow('DETECTED KEYPOINTS', datum.cvOutputData)
+        img2 = datum.cvOutputData
+        # Show line between hands
+        steer_color = steer_front
+        if steeringAngle < min_angle_front:
+            steer_color = steer_left
+        if steeringAngle > max_angle_front:
+            steer_color = steer_right
+        if not RightWirst_x[counter] == 0 and not LeftWirst_x[counter] == 0:
+            cv2.line(img2, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
+                     pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
+        cv2.imshow('DETECTED KEYPOINTS', img2)
         counter = counter + 1
 
         # Quit gesture
-        if (status == 0 and (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160)
+        print(quit_count)
+        if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
                 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
             quit_count = quit_count + 1
-            if (quit_count == 40):
+            if (quit_count > 40):
                 break
         else:
             quit_count = 0
