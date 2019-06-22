@@ -34,7 +34,7 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["number_people_max"] = 1
 params["body"] = 1
-params["alpha_pose"] = 0
+params["alpha_pose"] = 0.5
 # enable this to save data to json
 # params["write_json"] = "IVA_pose_estimation_results"
 
@@ -105,6 +105,7 @@ def main():
     fps = 0.0
     fps_last_time = time.time() - 1000
     fps_last_counter = counter - 1
+    quit_count = 0
 
     while True:
         # Update fps
@@ -184,7 +185,7 @@ def main():
                                        RightWirst_x[counter], -RightWirst_y[counter])
 
         # Direction and Stop
-        if ((status == 0 and 380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160)
+        if (status == 0 and 380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
                 and RightWirst_y[counter] > 380):
             status = 1
             Backward()
@@ -235,6 +236,15 @@ def main():
         # Output with OpenPose skeleton
         cv2.imshow('DETECTED KEYPOINTS', datum.cvOutputData)
         counter = counter + 1
+
+        # Quit gesture
+        if ((380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160)
+                and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
+            quit_count = quit_count + 1
+            if (quit_count == 40):
+                break
+        else:
+            quit_count = 0
 
         # q, Q == quit, STOP SCRIPT; NB: waitKey MUST BE 1
         key = cv2.waitKey(1)
