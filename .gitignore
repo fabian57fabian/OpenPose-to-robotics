@@ -63,3 +63,8 @@ Makefile
 openpose_python.py
 INSTALL.vcxproj
 INSTALL.vcxproj.filters
+
+
+# Files created for ANALYTICS
+
+Analytics/
