@@ -1,11 +1,12 @@
 #!/usr/bin/python
-import cv2
-import sys
-from sys import *
-import math
 import os
+import sys
 import time
-import numpy as np
+from sys import *
+
+import cv2
+import math
+
 from SerialManager import ConnectToSerial
 from Utils import parseArgs
 from analytics import ProcessAnalytics
@@ -70,8 +71,11 @@ RightWirst_y.append(0.0)
 LeftWirst_x.append(0.0)
 LeftWirst_y.append(0.0)
 
-# Car state: 0 (stop), 1 (backward), 2 (forward) (INT)
+# Car state: 0 (stop), 1 (go) (INT)
 status = 0
+last_status = 0
+# Car selected direction: 1 (backward), 2 (forward) (INT)
+selected_direction = 2
 # Steering Angle
 steeringAngle = 0.0
 _last_angle = 0.0
@@ -89,7 +93,7 @@ no_opt_steering_angles = []
 
 
 def main():
-    global speed, steeringAngle, status, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles
+    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles
     # Starting serial bluetooth connection
     if sendCommandsToCar:
         carSerial = ConnectToSerial()
@@ -152,9 +156,8 @@ def main():
         if status == 0:
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
         if status == 1:
-            cv2.putText(img, 'BACKWARD MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
-        if status == 2:
-            cv2.putText(img, 'FORWARD MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
+            _color = (0, 255, 0) if selected_direction == 1 else (255, 0, 0)
+            cv2.putText(img, ' GO  MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, _color, thickness=2)
 
         # Backward/Forward zones
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
@@ -185,57 +188,70 @@ def main():
                                        RightWirst_x[counter], -RightWirst_y[counter])
 
         # Direction and Stop
-        if (status == 0 and 380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
-                and RightWirst_y[counter] > 380):
+        # if both hands up
+        if LeftWirst_y[counter] < 380 and RightWirst_y[counter] < 380:
+            # Go time
             status = 1
-            Backward()
-            print('<-------BACKWARD', status)
         else:
-            if (status == 0 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640
-                    and LeftWirst_y[counter] > 380):
-                status = 2
-                Forward()
+            # if one or both hands down into command part
+            status = 0
+            Stop()
+            if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
+                    and RightWirst_y[counter] > 380):
+                selected_direction = 1
+                # Backward()
+                print('<-------BACKWARD', status)
+            elif (380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640
+                  and LeftWirst_y[counter] > 380):
+                selected_direction = 2
+                # Forward()
                 print('FORWARD-------->', status)
-            else:
-                if (((LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] > 380.0) or (
-                        LeftWirst_y[counter] == 0.0
-                        and RightWirst_y[
-                            counter] == 0.0) or (
-                             LeftWirst_y[counter] == 0.0 and RightWirst_y[counter] > 380.0)
-                     or (LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] == 0.0))
-                        and (160 < LeftWirst_x[counter] < 640 and 0 < RightWirst_x[counter] < 480)
-                        or (LeftWirst_x[counter] == 0.0 and RightWirst_x[counter] == 0.0)):
-                    speed = 0
-                    status = 0
-                    print('------STOP------', status)
-                    Stop()
+            elif (((LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] > 380.0) or (
+                    LeftWirst_y[counter] == 0.0
+                    and RightWirst_y[
+                        counter] == 0.0) or (
+                           LeftWirst_y[counter] == 0.0 and RightWirst_y[counter] > 380.0)
+                   or (LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] == 0.0))
+                  and (160 < LeftWirst_x[counter] < 640 and 0 < RightWirst_x[counter] < 480)
+                  or (LeftWirst_x[counter] == 0.0 and RightWirst_x[counter] == 0.0)):
+                speed = 0
+                Stop()
+                print('------STOP------', status)
+
+        # If we just exited from stop zone, a Forward of Backward call is needed
+        if status == 1 and last_status == 0:
+            if selected_direction == 1:
+                Backward()
+            elif selected_direction == 2:
+                Forward()
 
         # Gestures detection
-        if (status != 0 and min_angle_front < steeringAngle < max_angle_front
-                and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
-            speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
-            print('----FRONT----. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
-            sendSpeed()
-        else:
-            if (status != 0 and max_angle_front < steeringAngle < 90.0
-                    and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
+        if status == 1:
+            if (min_angle_front < steeringAngle < max_angle_front and RightWirst_y[counter] < 380.0 and LeftWirst_y[
+                counter] < 380.0):
                 speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
-                print('LEFT---------. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
-                      round(steeringAngle, 2))
+                print('----FRONT----. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
                 sendSpeed()
-                if FLIP_STEER:
-                    steeringAngle = -steeringAngle
-                Steer()
             else:
-                if (status != 0 and -90.0 < steeringAngle < min_angle_front
-                        and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
+                if (max_angle_front < steeringAngle < 90.0 and RightWirst_y[counter] < 380.0 and LeftWirst_y[
+                    counter] < 380.0):
                     speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
-                    print('--------RIGHT. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
+                    print('LEFT---------. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                           round(steeringAngle, 2))
                     sendSpeed()
                     if FLIP_STEER:
                         steeringAngle = -steeringAngle
                     Steer()
+                else:
+                    if (-90.0 < steeringAngle < min_angle_front and RightWirst_y[counter] < 380.0 and LeftWirst_y[
+                        counter] < 380.0):
+                        speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
+                        print('--------RIGHT. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
+                              round(steeringAngle, 2))
+                        sendSpeed()
+                        if FLIP_STEER:
+                            steeringAngle = -steeringAngle
+                        Steer()
 
         # Output with OpenPose skeleton
         img2 = datum.cvOutputData
@@ -250,6 +266,7 @@ def main():
                      pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
         cv2.imshow('DETECTED KEYPOINTS', img2)
         counter = counter + 1
+        last_status = status
 
         # Quit gesture
         if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
