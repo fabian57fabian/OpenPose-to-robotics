@@ -1,7 +1,6 @@
 import argparse
 
 
-
 def parseArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", default="0",
@@ -15,6 +14,10 @@ def parseArgs():
                         help="Compute analytics. (Default false)")
     parser.add_argument("--show-analytics", action="store_true", default=False,
                         help="Shows analytics after computation. (Default false)")
+    parser.add_argument("--unoptimized-speed", action="store_true", default=False,
+                        help="Disable speed optimization and error checking. (Default false)")
+    parser.add_argument("--unoptimized-steer", action="store_true", default=False,
+                        help="Disable steer optimization and error checking. (Default false)")
     args = parser.parse_args()
     _s = 0
     try:
@@ -22,4 +25,3 @@ def parseArgs():
     except:
         _s = args.source
     return (not args.disable_car), _s, args
-

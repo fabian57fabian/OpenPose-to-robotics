@@ -4,23 +4,48 @@ import numpy as np
 import os
 import sys
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--source", default="",
-                    help="Source file where numpy array is saved")
-args = parser.parse_args()
 
-if not os.path.exists(args.source):
-    print("File " + args.source + " doesn't exist!")
-    sys.exit(-1)
+def main():
+    main_dir = "Analytics/"
+    dirs = os.listdir(main_dir)
+    while True:
+        test_name = choose_dir(dirs)
+        _plot(main_dir + test_name + "/Speeds/", test_name)
+        _plot(main_dir + test_name + "/SteeringAngles/", test_name)
 
-data = np.fromfile(args.source, dtype=float)
-data1 = data.ravel()
 
-plt.figure()
-plt.plot(data1)
-plt.title(args.source + " analytics")
-plt.xlabel("Step")
-plt.ylabel("Data")
-figManager = plt.get_current_fig_manager()
-figManager.full_screen_toggle()
-plt.show()
+def _plot(folder, name):
+    plt.figure()
+    data = np.loadtxt(folder + "opt_" + name + ".txt", dtype=float).ravel()
+    data_nop = np.loadtxt(folder + "nop_" + name + ".txt", dtype=float).ravel()
+    plt.plot(data_nop)
+    plt.plot(data)
+    plt.title(name + " analytics")
+    plt.xlabel("Step")
+    plt.ylabel("Data")
+    figManager = plt.get_current_fig_manager()
+    figManager.full_screen_toggle()
+    plt.show()
+
+
+def choose_dir(dirs):
+    exit = False
+    selected_index = 0
+    while not exit:
+        for i, dd in enumerate(dirs):
+            print(str(i) + ": " + dd)
+        number = input("Choose the timestamp of test (type number): ")
+        try:
+            selected_index = int(number)
+            if 0 <= selected_index < len(dirs):
+                exit = True
+        except ValueError:
+            pass
+    return dirs[selected_index]
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass

@@ -44,6 +44,14 @@ params["alpha_pose"] = 0
 min_angle_front = -3
 max_angle_front = 3
 
+# Steering direction. Change to flip directions
+FLIP_STEER = True
+
+# Optimization for steer and speed.
+# Higher means safer but much more noise-affected
+SPEED_MAX_VARIATION = 150
+STEER_MAX_VARIATION = 90
+
 # Colors for steering line
 steer_front = (0, 255, 0)
 steer_right = (255, 0, 0)
@@ -66,14 +74,18 @@ LeftWirst_y.append(0.0)
 status = 0
 # Steering Angle
 steeringAngle = 0.0
+_last_angle = 0.0
 # Speed
 speed = 0
+last_speed = 0
 # Car connector
 carSerial = None
 
 # Analytics vars
-accelerations = []#np.array([])
-steering_angles = []#np.array([])
+accelerations = []
+no_opt_accelerations = []
+steering_angles = []
+no_opt_steering_angles = []
 
 
 def main():
@@ -92,7 +104,7 @@ def main():
 
     # Start webcam with VideoCapture. 0 -> use default webcam
     # WINDOWS_NORMAL dynamic window resize at running time
-    # resizeWindow output windows webcam dimension. RESOLUTION -> 4:3
+    # resizeWindow output windows webcam dimension. RESOLUSpeedsTION -> 4:3
     cv2.namedWindow('DETECTED KEYPOINTS', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('DETECTED KEYPOINTS', 1000, 750)
     stream = cv2.VideoCapture(source)
@@ -203,23 +215,27 @@ def main():
                 and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
             speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
             print('----FRONT----. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
-            sendSpeed(speed)
+            sendSpeed()
         else:
             if (status != 0 and max_angle_front < steeringAngle < 90.0
                     and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                 speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('LEFT---------. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                       round(steeringAngle, 2))
-                sendSpeed(speed)
-                Steer(- steeringAngle)
+                sendSpeed()
+                if FLIP_STEER:
+                    steeringAngle = -steeringAngle
+                Steer()
             else:
                 if (status != 0 and -90.0 < steeringAngle < min_angle_front
                         and RightWirst_y[counter] < 380.0 and LeftWirst_y[counter] < 380.0):
                     speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                     print('--------RIGHT. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                           round(steeringAngle, 2))
-                    sendSpeed(speed)
-                    Steer(- steeringAngle)
+                    sendSpeed()
+                    if FLIP_STEER:
+                        steeringAngle = -steeringAngle
+                    Steer()
 
         # Output with OpenPose skeleton
         img2 = datum.cvOutputData
@@ -233,11 +249,6 @@ def main():
             cv2.line(img2, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
                      pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
         cv2.imshow('DETECTED KEYPOINTS', img2)
-
-        if args.compute_analytics:
-            accelerations.append(speed)
-            steering_angles.append(steeringAngle)
-
         counter = counter + 1
 
         # Quit gesture
@@ -297,12 +308,27 @@ def speed_value(y1, y2):
 
 
 # Commands to Controller
-def sendSpeed(speed):
+def sendSpeed():
+    global last_speed, speed
+    if args.compute_analytics:
+        no_opt_accelerations.append(speed)
+    optimize_speed()
     if sendCommandsToCar:
         if speed > 200:
             carSerial.SetSpeed(100)
         else:
             carSerial.SetSpeed(int(speed / 2))
+    last_speed = speed
+    if args.compute_analytics:
+        accelerations.append(speed)
+
+
+def optimize_speed():
+    global speed, last_speed, SPEED_MAX_VARIATION
+    if args.unoptimized_speed:
+        return
+    if abs(last_speed - speed) > SPEED_MAX_VARIATION:
+        speed = last_speed
 
 
 def Backward():
@@ -320,9 +346,24 @@ def Stop():
         carSerial.Stop()
 
 
-def Steer(angle):
+def Steer():
+    global _last_angle, steeringAngle
+    if args.compute_analytics:
+        no_opt_steering_angles.append(steeringAngle)
+    optimize_steering()
     if sendCommandsToCar:
-        carSerial.Steer(angle)
+        carSerial.Steer(steeringAngle)
+    _last_angle = steeringAngle
+    if args.compute_analytics:
+        steering_angles.append(steeringAngle)
+
+
+def optimize_steering():
+    global steeringAngle, _last_angle, STEER_MAX_VARIATION
+    if args.unoptimized_steer:
+        return
+    if abs(_last_angle - steeringAngle) > STEER_MAX_VARIATION:
+        steeringAngle = _last_angle
 
 
 if __name__ == "__main__":
@@ -330,7 +371,7 @@ if __name__ == "__main__":
     # metto un commento
     try:
         main()
-        ProcessAnalytics(accelerations, steering_angles, args)
+        ProcessAnalytics(accelerations, no_opt_accelerations, steering_angles, no_opt_steering_angles, args)
     except Exception as e:
         print(e)
         sys.exit(-1)
