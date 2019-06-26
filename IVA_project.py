@@ -158,15 +158,15 @@ def main():
         if status == 0:
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
             if selected_direction == 1:
-                cv2.putText(img, 'B selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
+                cv2.putText(img, 'B selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
             elif selected_direction == 2:
-                cv2.putText(img, 'F selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
+                cv2.putText(img, 'F selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
         if status == 1 :
             cv2.putText(img, ' GO MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
             if selected_direction == 1:
-                cv2.putText(img, 'B selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
+                cv2.putText(img, 'B selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
             elif selected_direction == 2:
-                cv2.putText(img, 'F selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
+                cv2.putText(img, 'F selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
         # Quitting progress bar
         if quit_count != 0:
             cv2.putText(img, ' Quitting...', (10, 60), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
@@ -203,7 +203,7 @@ def main():
 
         # Direction and Stop
         # if both hands up
-        if LeftWirst_y[counter] < 380 and RightWirst_y[counter] < 380:
+        if LeftWirst_y[counter] < 380 and RightWirst_y[counter] < 380 and selected_direction != 0:
             # Go time
             status = 1
         else:
