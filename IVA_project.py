@@ -71,13 +71,13 @@ RightWirst_y.append(0.0)
 LeftWirst_x.append(0.0)
 LeftWirst_y.append(0.0)
 
-#MAx y speed on CAM, (MAX value = 380)
+# Max y speed on CAM, (MAX value = 380)
 MAX_SPEED_Y = 150
 # Car state: 0 (stop), 1 (go) (INT)
 status = 0
 last_status = 0
 # Car selected direction: 1 (backward), 2 (forward) (INT)
-selected_direction = 2
+selected_direction = 0
 # Steering Angle
 steeringAngle = 0.0
 _last_angle = 0.0
@@ -154,20 +154,24 @@ def main():
                     thickness=2)
         # Show Fps
         cv2.putText(img, "FPS: " + str(round(fps, 1)), (540, 90), cv2.FONT_HERSHEY_TRIPLEX, .5, (0, 0, 0), thickness=2)
-        # show Mode
+        # Show Mode
         if status == 0:
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
-        if status == 1:
-            _color = (0, 255, 0) if selected_direction == 1 else (255, 0, 0)
-            cv2.putText(img, ' GO MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, _color, thickness=2)
+            if selected_direction == 1:
+                cv2.putText(img, 'B selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
+            elif selected_direction == 2:
+                cv2.putText(img, 'F selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
+        if status == 1 :
+            cv2.putText(img, ' GO MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
+            if selected_direction == 1:
+                cv2.putText(img, 'B selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
+            elif selected_direction == 2:
+                cv2.putText(img, 'F selected', (160, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
         # Quitting progress bar
         if quit_count != 0:
             cv2.putText(img, ' Quitting...', (10, 60), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
             cv2.rectangle(img, (22, 70), (122, 90), (0, 255, 0), thickness=-2)
             cv2.rectangle(img, (22 + 5 * quit_count, 70), (122, 90), (255, 255, 255), thickness=-2)
-
-
-
 
         # Backward/Forward zones
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
@@ -209,18 +213,16 @@ def main():
             if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
                     and RightWirst_y[counter] > 380):
                 selected_direction = 1
-                # Backward()
                 print('<-------BACKWARD', status)
             elif (380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640
                   and LeftWirst_y[counter] > 380):
                 selected_direction = 2
-                # Forward()
                 print('FORWARD-------->', status)
             elif (((LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] > 380.0) or (
                     LeftWirst_y[counter] == 0.0
                     and RightWirst_y[
-                        counter] == 0.0) or (
-                           LeftWirst_y[counter] == 0.0 and RightWirst_y[counter] > 380.0)
+                        counter] == 0.0) or
+                   (LeftWirst_y[counter] == 0.0 and RightWirst_y[counter] > 380.0)
                    or (LeftWirst_y[counter] > 380.0 and RightWirst_y[counter] == 0.0))
                   and (160 < LeftWirst_x[counter] < 640 and 0 < RightWirst_x[counter] < 480)
                   or (LeftWirst_x[counter] == 0.0 and RightWirst_x[counter] == 0.0)):
@@ -234,6 +236,8 @@ def main():
                 Backward()
             elif selected_direction == 2:
                 Forward()
+        if last_status == 1 and status == 0:
+            selected_direction = 0
 
         # Gestures detection
         if status == 1:
