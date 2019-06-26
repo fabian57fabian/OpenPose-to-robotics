@@ -22,7 +22,7 @@ try:
         import pyopenpose as op
     else:
         # Change these variables to point to the correct folder (Release/x64 etc.)
-        sys.path.append('../../python');
+        sys.path.append('../../python')
         # If you run `make install` (default path is `/usr/local/python` for Ubuntu), you can also access the OpenPose/python module from there. This will install OpenPose and the python library at your desired installation path. Ensure that this is in your python path in order to use it.
         # sys.path.append('/usr/local/python')
         from openpose import pyopenpose as op
@@ -161,8 +161,8 @@ def main():
                 cv2.putText(img, 'B selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
             elif selected_direction == 2:
                 cv2.putText(img, 'F selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
-        if status == 1 :
-            cv2.putText(img, ' GO MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
+        elif status == 1 :
+            cv2.putText(img, 'GO MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
             if selected_direction == 1:
                 cv2.putText(img, 'B selected', (170, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (255, 0, 0), thickness=2)
             elif selected_direction == 2:
@@ -247,8 +247,8 @@ def main():
                 print('----FRONT----. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
                 sendSpeed()
             else:
-                if (max_angle_front < steeringAngle < 90.0 and RightWirst_y[counter] < 380.0 and LeftWirst_y[
-                    counter] < 380.0):
+                if (max_angle_front < steeringAngle < 90.0 and RightWirst_y[counter] < 380.0
+                        and LeftWirst_y[counter] < 380.0):
 
                     print('LEFT---------. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                           round(steeringAngle, 2))
@@ -257,8 +257,8 @@ def main():
                         steeringAngle = -steeringAngle
                     Steer()
                 else:
-                    if (-90.0 < steeringAngle < min_angle_front and RightWirst_y[counter] < 380.0 and LeftWirst_y[
-                        counter] < 380.0):
+                    if (-90.0 < steeringAngle < min_angle_front and RightWirst_y[counter] < 380.0
+                            and LeftWirst_y[counter] < 380.0):
 
                         print('--------RIGHT. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                               round(steeringAngle, 2))
@@ -287,7 +287,7 @@ def main():
                 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
             cv2.rectangle(img, (160, 400), (480, 420), (0, 255, 0), thickness=2)
             quit_count = quit_count + 1
-            if (quit_count > 21):
+            if quit_count > 21:
                 break
         else:
             quit_count = 0
