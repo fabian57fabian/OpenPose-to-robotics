@@ -159,7 +159,15 @@ def main():
             cv2.putText(img, 'STOP MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 0, 255), thickness=2)
         if status == 1:
             _color = (0, 255, 0) if selected_direction == 1 else (255, 0, 0)
-            cv2.putText(img, ' GO  MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, _color, thickness=2)
+            cv2.putText(img, ' GO MODE', (20, 30), cv2.FONT_HERSHEY_TRIPLEX, 0.7, _color, thickness=2)
+        # Quitting progress bar
+        if quit_count != 0:
+            cv2.putText(img, ' Quitting...', (10, 60), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
+            cv2.rectangle(img, (22, 70), (122, 90), (0, 255, 0), thickness=-2)
+            cv2.rectangle(img, (22 + 5 * quit_count, 70), (122, 90), (255, 255, 255), thickness=-2)
+
+
+
 
         # Backward/Forward zones
         cv2.rectangle(img, (0, 380), (160, 480), (0, 255, 0), thickness=2)
@@ -273,8 +281,9 @@ def main():
         # Quit gesture
         if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
                 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
+            cv2.rectangle(img, (160, 400), (480, 420), (0, 255, 0), thickness=2)
             quit_count = quit_count + 1
-            if (quit_count > 20):
+            if (quit_count > 21):
                 break
         else:
             quit_count = 0
