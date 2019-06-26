@@ -71,6 +71,8 @@ RightWirst_y.append(0.0)
 LeftWirst_x.append(0.0)
 LeftWirst_y.append(0.0)
 
+#MAx y speed on CAM, (MAX value = 380)
+MAX_SPEED_Y = 150
 # Car state: 0 (stop), 1 (go) (INT)
 status = 0
 last_status = 0
@@ -227,15 +229,15 @@ def main():
 
         # Gestures detection
         if status == 1:
+            speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
             if (min_angle_front < steeringAngle < max_angle_front and RightWirst_y[counter] < 380.0 and LeftWirst_y[
                 counter] < 380.0):
-                speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
                 print('----FRONT----. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
                 sendSpeed()
             else:
                 if (max_angle_front < steeringAngle < 90.0 and RightWirst_y[counter] < 380.0 and LeftWirst_y[
                     counter] < 380.0):
-                    speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
+
                     print('LEFT---------. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                           round(steeringAngle, 2))
                     sendSpeed()
@@ -245,7 +247,7 @@ def main():
                 else:
                     if (-90.0 < steeringAngle < min_angle_front and RightWirst_y[counter] < 380.0 and LeftWirst_y[
                         counter] < 380.0):
-                        speed = int(speed_value(RightWirst_y[counter], LeftWirst_y[counter]))
+
                         print('--------RIGHT. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ',
                               round(steeringAngle, 2))
                         sendSpeed()
@@ -272,7 +274,7 @@ def main():
         if (380 < LeftWirst_y[counter] < 480 and 0 < LeftWirst_x[counter] < 160
                 and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
             quit_count = quit_count + 1
-            if (quit_count > 40):
+            if (quit_count > 20):
                 break
         else:
             quit_count = 0
@@ -326,15 +328,15 @@ def speed_value(y1, y2):
 
 # Commands to Controller
 def sendSpeed():
-    global last_speed, speed
+    global last_speed, speed, MAX_SPEED_Y
     if args.compute_analytics:
         no_opt_accelerations.append(speed)
     optimize_speed()
     if sendCommandsToCar:
-        if speed > 200:
+        if speed > MAX_SPEED_Y:
             carSerial.SetSpeed(100)
         else:
-            carSerial.SetSpeed(int(speed / 2))
+            carSerial.SetSpeed(int(speed / (MAX_SPEED_Y/100)))
     last_speed = speed
     if args.compute_analytics:
         accelerations.append(speed)
