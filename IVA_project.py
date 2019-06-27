@@ -283,10 +283,9 @@ def main():
         if not RightWirst_x[counter] == 0 and not LeftWirst_x[counter] == 0:
             cv2.line(img2, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
                      pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
-        """
-        # moving average filter
-        img2 = moving_average_filter(img2, avg, 0.1)
-        """
+
+        if args.moving_average_filter:
+            img2 = moving_average_filter(img2, avg, 0.1)
 
         cv2.imshow('DETECTED KEYPOINTS', img2)
         counter = counter + 1
@@ -407,14 +406,11 @@ def optimize_steering():
     if abs(_last_angle - steeringAngle) > STEER_MAX_VARIATION:
         steeringAngle = _last_angle
 
-
 def moving_average_filter(img, avg, alpha):
     # alpha regulates the update speed (how fast the accumulator “forgets” about earlier images)
-    if args.moving_average_filter:
         cv2.accumulateWeighted(img, avg, alpha)
         res = cv2.convertScaleAbs(avg)
         return res
-
 
 if __name__ == "__main__":
     # rimesso apposto il main
