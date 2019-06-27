@@ -63,6 +63,7 @@ Makefile
 openpose_python.py
 INSTALL.vcxproj
 INSTALL.vcxproj.filters
+movingAverageFilter.py
 
 
 # Files created for ANALYTICS

@@ -3,10 +3,9 @@ import os
 import sys
 import time
 from sys import *
-
+import numpy as np
 import cv2
 import math
-
 from SerialManager import ConnectToSerial
 from Utils import parseArgs
 from analytics import ProcessAnalytics
@@ -131,6 +130,11 @@ def main():
     fps_last_counter = counter - 1
     quit_count = 0
 
+    # moving average filter
+    ret, img = stream.read()
+    avg = np.float32(img)
+
+
     while True:
         # Update fps
         if counter % 5 == 1:
@@ -142,6 +146,7 @@ def main():
         ret, img = stream.read()
         # Output flip
         cv2.flip(img, 1, img)
+
         # Stop Line
         cv2.line(img, (160, 380), (480, 380), (0, 0, 255), thickness=3)
         cv2.putText(img, 'STOP', (260, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 0, 255), thickness=2)
@@ -278,6 +283,11 @@ def main():
         if not RightWirst_x[counter] == 0 and not LeftWirst_x[counter] == 0:
             cv2.line(img2, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
                      pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
+        """
+        # moving average filter
+        img2 = moving_average_filter(img2, avg, 0.1)
+        """
+
         cv2.imshow('DETECTED KEYPOINTS', img2)
         counter = counter + 1
         last_status = status
@@ -396,6 +406,14 @@ def optimize_steering():
         return
     if abs(_last_angle - steeringAngle) > STEER_MAX_VARIATION:
         steeringAngle = _last_angle
+
+
+def moving_average_filter(img, avg, alpha):
+    # alpha regulates the update speed (how fast the accumulator “forgets” about earlier images)
+    if args.moving_average_filter:
+        cv2.accumulateWeighted(img, avg, alpha)
+        res = cv2.convertScaleAbs(avg)
+        return res
 
 
 if __name__ == "__main__":
