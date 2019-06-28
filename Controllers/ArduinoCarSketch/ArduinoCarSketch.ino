@@ -3,7 +3,7 @@
 #include <AFMotor.h> // the library for the Adafruit L293 Arduino Motor Shield
 
 char incomingCommand = '~'; // for incoming serial data
-int speed_min = 100; //the minimum "speed" the motors will turn - take it lower and motors don't turn
+int speed_min = 0; //the minimum "speed" the motors will turn - take it lower and motors don't turn
 int speed_max = 255; //the maximum "speed" the motors will turn – you can’t put in higher
 int pinServo = 10;
 int pinState = 22;
