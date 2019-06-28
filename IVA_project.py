@@ -45,7 +45,7 @@ min_angle_front = -3
 max_angle_front = 3
 
 # Steering direction. Change to flip directions
-FLIP_STEER = True
+FLIP_STEER = False
 
 # Optimization for steer and speed.
 # Higher means safer but much more noise-affected
@@ -71,7 +71,7 @@ LeftWirst_x.append(0.0)
 LeftWirst_y.append(0.0)
 
 # Max y speed on CAM, (MAX value = 380)
-MAX_SPEED_Y = 150
+MAX_SPEED_Y = 200
 # Car state: 0 (stop), 1 (go) (INT)
 status = 0
 last_status = 0
@@ -92,9 +92,13 @@ no_opt_accelerations = []
 steering_angles = []
 no_opt_steering_angles = []
 
+# moving average filter parameter
+# alpha regulates the update speed (how fast the accumulator “forgets” about earlier images)
+alpha = 0.8
+
 
 def main():
-    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles
+    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha
     # Starting serial bluetooth connection
     if sendCommandsToCar:
         carSerial = ConnectToSerial()
@@ -284,8 +288,7 @@ def main():
             cv2.line(img2, pt1=(int(RightWirst_x[counter]), int(RightWirst_y[counter])),
                      pt2=(int(LeftWirst_x[counter]), int(LeftWirst_y[counter])), color=steer_color, thickness=5)
 
-        if args.moving_average_filter:
-            img2 = moving_average_filter(img2, avg, 0.1)
+        img2 = imshow_img(img2, avg, alpha)
 
         cv2.imshow('DETECTED KEYPOINTS', img2)
         counter = counter + 1
@@ -406,11 +409,13 @@ def optimize_steering():
     if abs(_last_angle - steeringAngle) > STEER_MAX_VARIATION:
         steeringAngle = _last_angle
 
-def moving_average_filter(img, avg, alpha):
-    # alpha regulates the update speed (how fast the accumulator “forgets” about earlier images)
+def imshow_img(img, avg, alpha):
+    if args.moving_average_filter:
         cv2.accumulateWeighted(img, avg, alpha)
         res = cv2.convertScaleAbs(avg)
         return res
+    else:
+        return img
 
 if __name__ == "__main__":
     # rimesso apposto il main
