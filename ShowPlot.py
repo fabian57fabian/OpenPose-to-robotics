@@ -12,6 +12,7 @@ def main():
         test_name = choose_dir(dirs)
         _plot(main_dir + test_name + "/Speeds/", test_name)
         _plot(main_dir + test_name + "/SteeringAngles/", test_name)
+        _plotFps(main_dir + test_name + "/FpsLoss/", test_name)
 
 
 def _plot(folder, name):
@@ -23,6 +24,20 @@ def _plot(folder, name):
     plt.title(name + " analytics")
     plt.xlabel("Step")
     plt.ylabel("Data")
+    figManager = plt.get_current_fig_manager()
+    figManager.full_screen_toggle()
+    plt.show()
+
+
+def _plotFps(folder, name):
+    plt.figure()
+    filename = folder + "fps_loss_" + name + ".txt"
+    data = np.loadtxt(filename, dtype=float).ravel()
+    x_data = np.arange(len(data))
+    plt.scatter(x_data, data)
+    plt.title(name + " analytics")
+    plt.xlabel("Step")
+    plt.ylabel("Fps loss")
     figManager = plt.get_current_fig_manager()
     figManager.full_screen_toggle()
     plt.show()
