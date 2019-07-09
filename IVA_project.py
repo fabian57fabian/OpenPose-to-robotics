@@ -119,8 +119,8 @@ def main():
     # Start webcam with VideoCapture. 0 -> use default webcam
     # WINDOWS_NORMAL dynamic window resize at running time
     # resizeWindow output windows webcam dimension. RESOLUSpeedsTION -> 4:3
-    cv2.namedWindow('DETECTED KEYPOINTS', cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('DETECTED KEYPOINTS', 1000, 750)
+    cv2.namedWindow('OPtoROBO', cv2.WINDOW_NORMAL)
+    cv2.resizeWindow('OPtoROBO', 1000, 750)
     stream = cv2.VideoCapture(source)
     time.sleep(2)
     if stream is None:
@@ -156,6 +156,10 @@ def main():
         ret, img = stream.read()
         # Output flip
         cv2.flip(img, 1, img)
+
+
+        # Bilateral Filtering
+        img = cv2.bilateralFilter(img, 9, 40, 75)
 
         datum = op.Datum()
         datum.cvInputData = img
@@ -274,7 +278,7 @@ def main():
 
         # Stop Line
         cv2.line(img2, (160, 380), (480, 380), (0, 0, 255), thickness=3)
-        cv2.putText(img, 'STOP', (260, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 0, 255), thickness=2)
+        cv2.putText(img2, 'STOP', (260, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 0, 255), thickness=2)
         cv2.putText(img2, 'B', (65, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (0, 255, 0), thickness=2)
         cv2.putText(img2, 'F', (545, 420), cv2.FONT_HERSHEY_TRIPLEX, 1.5, (255, 0, 0), thickness=2)
         # Show speedometer
