@@ -36,7 +36,7 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["number_people_max"] = 1
 params["body"] = 1
-params["alpha_pose"] = 0
+params["alpha_pose"] = 1
 # enable this to save data to json
 # params["write_json"] = "IVA_pose_estimation_results"
 
@@ -59,12 +59,28 @@ steer_front = (0, 255, 0)
 steer_right = (255, 0, 0)
 steer_left = (255, 0, 0)
 
+
+class VarNoList:
+
+    def __init__(self):
+        self.value = 0
+
+    def append(self, val):
+        self.value = val
+
+    def __getitem__(self, count):
+        return self.value
+
+    def __len__(self):
+        return 1
+
+
 ###Global using vars
 # Wirsts keypoints arrays
-RightWirst_x = []
-RightWirst_y = []
-LeftWirst_x = []
-LeftWirst_y = []
+RightWirst_x = VarNoList()  # []
+RightWirst_y = VarNoList()  # []
+LeftWirst_x = VarNoList()  # []
+LeftWirst_y = VarNoList()  # []
 
 # Appending first wirsts keypoints
 RightWirst_x.append(0.0)
@@ -94,8 +110,8 @@ no_opt_accelerations = []
 steering_angles = []
 no_opt_steering_angles = []
 
-# Counter for errors in body
-MAX_OP_COUNTER = 4
+# Counter for errors in body. 1 means fps count. 0.5 means a half of fps count....
+MAX_OP_MULTIPLIER = .8
 
 # moving average filter parameter
 # alpha regulates the update speed (how fast the accumulator “forgets” about earlier images)
@@ -103,7 +119,7 @@ alpha = 0.8
 
 
 def main():
-    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha, MAX_OP_COUNTER
+    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha,MAX_OP_MULTIPLIER
     # Starting serial bluetooth connection
     if sendCommandsToCar:
         carSerial = ConnectToSerial()
@@ -157,7 +173,6 @@ def main():
         # Output flip
         cv2.flip(img, 1, img)
 
-
         # Bilateral Filtering
         img = cv2.bilateralFilter(img, 9, 40, 75)
 
@@ -172,16 +187,16 @@ def main():
             print('NO DETECTED PEOPLE, YOU SHOULD GO IN FRONT OF YOUR WEBCAM')
             # time.sleep(.5)
             error_op_counter += 1
-            if error_op_counter > MAX_OP_COUNTER:
+            if error_op_counter > (int(fps / MAX_OP_MULTIPLIER)):
                 RightWirst_x.append(400.0)
                 RightWirst_y.append(440.0)
                 LeftWirst_x.append(250.0)
                 LeftWirst_y.append(440.0)
             else:
-                RightWirst_x.append(RightWirst_x[len(RightWirst_y)-1])
-                RightWirst_y.append(RightWirst_y[len(RightWirst_y)-1])
-                LeftWirst_x.append(LeftWirst_x[len(LeftWirst_x)-1])
-                LeftWirst_y.append(LeftWirst_x[len(LeftWirst_x)-1])
+                RightWirst_x.append(RightWirst_x[len(RightWirst_y) - 1])
+                RightWirst_y.append(RightWirst_y[len(RightWirst_y) - 1])
+                LeftWirst_x.append(LeftWirst_x[len(LeftWirst_x) - 1])
+                LeftWirst_y.append(LeftWirst_x[len(LeftWirst_x) - 1])
         else:
             error_op_counter = 0
             try:
@@ -241,7 +256,7 @@ def main():
                 speed = 0
             if (min_angle_front < steeringAngle < max_angle_front and RightWirst_y[counter] < 380.0 and LeftWirst_y[
                 counter] < 380.0):
-                print('----FRONT----. STATUS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
+                print('----FRONT----. STATUspeedMS: ', status_to_str(), '. SPEED:  ', speed, '. ANGLE: ', 0)
                 sendSpeed()
             else:
                 if (max_angle_front < steeringAngle < 90.0 and RightWirst_y[counter] < 380.0
@@ -291,7 +306,8 @@ def main():
                     (0, 0, 0),
                     thickness=2)
         # Show Fps
-        cv2.putText(img2, "FPS: " + str(round(fps, 1)), (right_UI_status_X, 90), cv2.FONT_HERSHEY_TRIPLEX, .5, (0, 0, 0),
+        cv2.putText(img2, "FPS: " + str(round(fps, 1)), (right_UI_status_X, 90), cv2.FONT_HERSHEY_TRIPLEX, .5,
+                    (0, 0, 0),
                     thickness=2)
         # Show Mode
         if status == 0:
@@ -319,6 +335,10 @@ def main():
         img2 = imshow_img(img2, avg, alpha)
 
         cv2.imshow('OPtoROBO', img2)
+
+        if speed >= 370:
+            c = 0
+
         counter = counter + 1
         last_status = status
 
@@ -466,6 +486,9 @@ def datumChecks(keypoints):
         if keypoints.shape[0] < 1:
             return False
         if keypoints.shape[1] < 8:
+            return False
+        if keypoints[0][7][0] == 0.0 and keypoints[0][7][1] == 00.0 or keypoints[0][4][0] == 00.0 and keypoints[0][4][
+            1] == 00.0:
             return False
         return True
     except Exception as ee:

@@ -16,14 +16,14 @@ def createFileName(folder, name):
     return folder + separator + name
 
 
-def ProcessAnalytics(accelerations, no_opt_acc, steering_angles, no_opt_steer, fps_loss, args):
+def ProcessAnalytics(accelerations, no_opt_acc, steering_angles, no_opt_steer, args):#fps_loss
     if args.compute_analytics:
         name = time.strftime("%Y%m%d_%H%M%S")
         path = main_folder + name + "/"
         os.makedirs(path)
         ProcessSpeeds(accelerations, no_opt_acc, args.show_analytics, path, name)
         ProcessSteeringAngles(steering_angles, no_opt_steer, args.show_analytics, path, name)
-        ProcessFpsLoss(fps_loss, args.show_analytics, path, name)
+        #ProcessFpsLoss(fps_loss, args.show_analytics, path, name)
 
 
 def ProcessFpsLoss(fps_loss, show, folder, name):
