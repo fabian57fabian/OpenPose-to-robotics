@@ -7,7 +7,9 @@
 
 ## How?
 Simply place in front of your webcam, start **OPtoROBO** and drive your car using hands gestures (moving up, down, steering).
-A simple graphical interface is there to help you.
+A simple graphical interface is there to help you. [See intro video](https://youtu.be/VZsERaSSXtw).
+
+[![Intro video](https://img.youtube.com/vi/VZsERaSSXtw/hqdefault.jpg)](https://youtu.be/VZsERaSSXtw)
 
 ## Technology
 We're currently using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to detect human body and processing that data to drive your car. We're using a cool DIY arduino car with bluetooth connection but any RC car with programmable MCU unit onboard will be allright.
