@@ -36,7 +36,7 @@ params = dict()
 params["model_folder"] = "../../../models/"
 params["number_people_max"] = 1
 params["body"] = 1
-params["alpha_pose"] = 1
+params["alpha_pose"] = 1 if args.show_skeleton else 0
 # enable this to save data to json
 # params["write_json"] = "IVA_pose_estimation_results"
 
@@ -119,7 +119,7 @@ alpha = 0.8
 
 
 def main():
-    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha,MAX_OP_MULTIPLIER
+    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha, MAX_OP_MULTIPLIER
     # Starting serial bluetooth connection
     if sendCommandsToCar:
         carSerial = ConnectToSerial()

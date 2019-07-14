@@ -20,6 +20,8 @@ def parseArgs():
                         help="Disable steer optimization and error checking. (Default false)")
     parser.add_argument("--moving-average-filter", action="store_true", default=False,
                         help="Use moving average filter for denoising. (Default false)")
+    parser.add_argument("--show-skeleton", action="store_true", default=False,
+                        help="Shows body kypoints and skeleton. (Default false)")
     args = parser.parse_args()
     _s = 0
     try:
