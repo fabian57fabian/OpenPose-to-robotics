@@ -12,7 +12,7 @@ def main():
         test_name = choose_dir(dirs)
         _plot(main_dir + test_name + "/Speeds/", test_name)
         _plot(main_dir + test_name + "/SteeringAngles/", test_name)
-        _plotFps(main_dir + test_name + "/FpsLoss/", test_name)
+        # _plotFps(main_dir + test_name + "/FpsLoss/", test_name)
 
 
 def _plot(folder, name):
