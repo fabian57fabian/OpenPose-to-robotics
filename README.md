@@ -12,7 +12,8 @@ A simple graphical interface is there to help you. [See intro video](https://you
 [![Intro video](https://img.youtube.com/vi/VZsERaSSXtw/hqdefault.jpg)](https://youtu.be/VZsERaSSXtw)
 
 ## Technology
-We're currently using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to detect human body and processing that data to drive your car. We're using a cool DIY arduino car with bluetooth connection but any RC car with programmable MCU unit onboard will be allright. Check out the [connections circuit](https://github.com/fabian57fabian/OpenPose-to-robotics/blob/master/images/CarMainSketch_image.png).
+We're currently using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to detect human body and processing that data to drive your car. We're using a cool DIY arduino car with bluetooth connection but any RC car with programmable MCU unit onboard will be allright. Check out the [arduino code](https://github.com/fabian57fabian/OpenPose-to-robotics/blob/master/Controllers/ArduinoCarSketch/ArduinoCarSketch.ino) using this [connections circuit](https://github.com/fabian57fabian/OpenPose-to-robotics/blob/master/images/CarMainSketch_image.png) for arduino car with one dc motor and a servo for steering. If you have an RC car with only 2 wheels use the other [arduino code for 2 wheels](https://github.com/fabian57fabian/OpenPose-to-robotics/blob/master/Controllers/ArduinoCarSketch_2Wheel/ArduinoCarSketch_2Wheel.ino) with [this schematics](https://github.com/fabian57fabian/OpenPose-to-robotics/blob/master/images/CarSecondarySketch_image.png).
+Feel free to change global vars according to your project (like speed_balance in 2wheel sketch if you have one motor faster than the other).
 
 # Installation
 1. Before doing anything, **clone** and **install** [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) and follow the instructions (good luck there, it's quite difficult).
