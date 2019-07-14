@@ -12,7 +12,7 @@ A simple graphical interface is there to help you. [See intro video](https://you
 [![Intro video](https://img.youtube.com/vi/VZsERaSSXtw/hqdefault.jpg)](https://youtu.be/VZsERaSSXtw)
 
 ## Technology
-We're currently using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to detect human body and processing that data to drive your car. We're using a cool DIY arduino car with bluetooth connection but any RC car with programmable MCU unit onboard will be allright.
+We're currently using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) to detect human body and processing that data to drive your car. We're using a cool DIY arduino car with bluetooth connection but any RC car with programmable MCU unit onboard will be allright. Check out the [connections circuit](https://github.com/fabian57fabian/OpenPose-to-robotics/blob/master/images/CarMainSketch_image.png).
 
 # Installation
 1. Before doing anything, **clone** and **install** [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose) and follow the instructions (good luck there, it's quite difficult).
