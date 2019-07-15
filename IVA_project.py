@@ -45,7 +45,7 @@ min_angle_front = -3
 max_angle_front = 3
 
 # Steering direction. Change to flip directions
-FLIP_STEER = False
+FLIP_STEER = args.flip_steer
 
 # Optimization for steer and speed.
 # Higher means safer but much more noise-affected
@@ -119,7 +119,7 @@ alpha = 0.8
 
 
 def main():
-    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha, MAX_OP_MULTIPLIER
+    global speed, steeringAngle, status, last_status, selected_direction, RightWirst_y, RightWirst_x, LeftWirst_y, LeftWirst_x, carSerial, accelerations, steering_angles, alpha, MAX_OP_MULTIPLIER, FLIP_STEER
     # Starting serial bluetooth connection
     if sendCommandsToCar:
         carSerial = ConnectToSerial()
@@ -267,7 +267,7 @@ def main():
                     sendSpeed()
                     if FLIP_STEER:
                         steeringAngle = -steeringAngle
-                    Steer()
+                    Steer(FLIP_STEER)
                 else:
                     if (-90.0 < steeringAngle < min_angle_front and RightWirst_y[counter] < 380.0
                             and LeftWirst_y[counter] < 380.0):
@@ -277,7 +277,7 @@ def main():
                         sendSpeed()
                         if FLIP_STEER:
                             steeringAngle = -steeringAngle
-                        Steer()
+                        Steer(FLIP_STEER)
 
         # Output with OpenPose skeleton
         img2 = datum.cvOutputData
@@ -326,7 +326,7 @@ def main():
         if quit_count != 0:
             cv2.putText(img2, ' Quitting...', (10, 60), cv2.FONT_HERSHEY_TRIPLEX, 0.7, (0, 255, 0), thickness=2)
             cv2.rectangle(img2, (22, 70), (122, 90), (0, 255, 0), thickness=-2)
-            cv2.rectangle(img2, (22 + 5 * quit_count, 70), (122, 90), (255, 255, 255), thickness=-2)
+            cv2.rectangle(img2, (22 + 10 * quit_count, 70), (122, 90), (255, 255, 255), thickness=-2)
 
         # Backward/Forward zones
         cv2.rectangle(img2, (0, 380), (160, 480), (0, 255, 0), thickness=2)
@@ -348,7 +348,7 @@ def main():
                     and 380 < RightWirst_y[counter] < 480 and 480 < RightWirst_x[counter] < 640):
                 cv2.rectangle(img, (160, 400), (480, 420), (0, 255, 0), thickness=2)
                 quit_count = quit_count + 1
-                if quit_count > 21:
+                if quit_count > 10:
                     break
             else:
                 quit_count = 0
@@ -446,13 +446,13 @@ def Stop():
         carSerial.Stop()
 
 
-def Steer():
+def Steer(flip):
     global _last_angle, steeringAngle
     if args.compute_analytics:
         no_opt_steering_angles.append(steeringAngle)
     optimize_steering()
     if sendCommandsToCar:
-        carSerial.Steer(steeringAngle)
+        carSerial.Steer(steeringAngle, flip)
     _last_angle = steeringAngle
     if args.compute_analytics:
         steering_angles.append(steeringAngle)
@@ -497,8 +497,6 @@ def datumChecks(keypoints):
 
 
 if __name__ == "__main__":
-    # rimesso apposto il main
-    # metto un commento
     main()
     try:
         ProcessAnalytics(accelerations, no_opt_accelerations, steering_angles, no_opt_steering_angles, args)

@@ -53,18 +53,18 @@ class ArduinoConnector:
         Takes a steer value in range [-90,90] and sends it correctly
     """
 
-    def Steer(self, angle):
+    def Steer(self, angle, flip =True):
         grades = int(angle)
         final_command = 128
         if -90 <= grades < -50:
-            final_command = 'L'
+            final_command = 'L' if flip else 'R'
         elif -50 <= grades <= 50:
             val = int(grades) + 50
             # send char in range [128,228]
             converted_angle = int(self.map(val, 0, 100, 85, 126))
             final_command = chr(converted_angle)  # chr(converted_angle)
         elif 50 < grades <= 90:
-            final_command = 'R'
+            final_command = 'R' if flip else 'L'
         else:
             print("Angle not right:" + str(angle))
             return
